@@ -1,0 +1,5 @@
+[
+    {"id": 1, "name": "Телефон", "price": 50000, "quantity": 3, "image": "/images/phone.jpg"},
+    {"id": 2, "name": "Ожерелье", "price": 3500, "quantity": 4, "image": "/images/ожерелье.jpg"},
+    {"id": 3, "name": "Кроссовки", "price": 3000, "quantity": 5, "image": "/images/crosi.webp"} 
+]
