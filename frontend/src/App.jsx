@@ -1,12 +1,33 @@
 import { useEffect, useState } from 'react'
 import Header from './components/Header'
 import ProductCard from './components/ProductCard'
+import { stringify } from 'postcss';
 
 function App() {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [card, setCard] = useState([]);
+  const [view, setView] = useState('shop');
+
+  const [wishlist, setwishlist] = useState(() => {
+    const saved = localStorage.getItem('my_wishlist')
+    return saved ? JSON.parse(saved) : []
+  });
+
+  useEffect(() => {
+    localStorage.setItem('my_wishlist', JSON.stringify(wishlist))
+  }, [wishlist])
+
+  const toggleWishlist = (product) => {
+    setwishlist((prev) => {
+      const isExist = prev.find(item => item.id === product.id);
+      if (isExist) {
+        return prev.filter(item => item.id !== product.id);
+      }
+      return [...prev, product];
+    });
+  };
 
    const updateProductQuantity = (productId) => {
     setProducts(prevProducts =>
@@ -56,30 +77,48 @@ function App() {
 
   return (
     <div style={{ backgroundColor: '#f9f9f9', minHeight: '100vh' }}>
-      <Header cartCount={card.length} totalPrice={totalPrice} />
+      <Header cartCount={card.length} totalPrice={totalPrice} 
+      onOpenVishList={() => setView('wishlist')} onOpenShop={() => setView('shop')} wishlistCount={wishlist.length}/>
       
       <main style={{ padding: '0 40px' }}>
-        <h1 style={{ textAlign: 'center', marginBottom: '40px' }}>Наши товары</h1>
-        
-        {isLoading && <p style={{ textAlign: 'center' }}>⏳ Загружаем товары...</p>}
-
-        {error && (
-          <div style={{ textAlign: 'center', color: 'red', padding: '20px' }}>
-            ⚠️ {error}
-          </div>
-        )}
-
-        {!isLoading && !error &&(
-          <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-          gap: '25px'
-        }}>
-          {products.map(product => (
-            <ProductCard key={product.id} product={product} onAdd={() => addToCart(product)}/>
-          ))}
-        </div>
-        )}
+        {view === 'shop' ? (
+          <>
+            <h1 style={{ textAlign: 'center', marginBottom: '30px'}}>Наши товары</h1>
+            {isLoading && <p>Загрузка...</p>}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
+              {products.map(product => (
+                <ProductCard 
+                  key={product.id} 
+                  product={product} 
+                  onAdd={() => addToCart(product)}
+                  onWishlist={() => toggleWishlist(product)}
+                  isFavorite={wishlist.some(item => item.id === product.id)}
+                />
+              ))}
+            </div>
+          </>
+        ) : (
+          <>
+            <button onClick={() => setView('shop')} style={{ marginBottom: '20px' }}>← Вернуться в магазин</button>
+            <h1 style={{ textAlign: 'center' }}>Мой список желаний ({wishlist.length})</h1>
+            
+            {wishlist.length === 0 ? (
+              <p style={{ textAlign: 'center' }}>Тут пока ничего нет...</p>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
+                {wishlist.map(product => (
+                  <ProductCard 
+                    key={product.id} 
+                    product={product} 
+                    onAdd={() => addToCart(product)}
+                    onWishlist={() => toggleWishlist(product)}
+                    isFavorite={true}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        )}       
       </main>
     </div>
   );

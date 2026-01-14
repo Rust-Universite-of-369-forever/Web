@@ -1,4 +1,4 @@
-function ProductCard({ product, onAdd }) {
+function ProductCard({ product, onAdd, onWishlist, isFavorite }) {
   const isOutOfStock = product.quantity <= 0;
 
   return (
@@ -49,6 +49,13 @@ function ProductCard({ product, onAdd }) {
         }}
       >
         {isOutOfStock ? 'Закончился' : 'В корзину'}
+      </button>
+
+      <button 
+        onClick={onWishlist} 
+        style={{ color: isFavorite ? 'red' : 'gray', border: 'none', background: 'none', cursor: 'pointer' }}
+      >
+        {isFavorite ? '❤️' : '🤍'}
       </button>
     </div>
   );

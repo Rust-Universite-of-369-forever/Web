@@ -1,4 +1,4 @@
-function Header({ cartCount, totalPrice }) {
+function Header({ cartCount, wishlistCount, totalPrice, onOpenWishlist, onOpenShop}) {
   return (
     <header style={{
       display: 'flex',
@@ -8,11 +8,16 @@ function Header({ cartCount, totalPrice }) {
       backgroundColor: '#2c3e50',
       color: 'white'
     }}>
-      <h2>Онлайн магазин</h2>
-      <div style={{ textAlign: 'left' }}>
-        <div>🛒 Товаров: <strong>{cartCount}</strong></div>
-        <div style={{ fontSize: '0.9rem', color: '#2ecc71' }}>
-          Сумма: <strong>{totalPrice} ₽</strong>
+      <div onClick={onOpenShop} style={{ cursor: 'pointer', fontWeight: 'bold' }}>Онлайн магазин</div>
+      
+      <div style={{ display: 'flex', gap: '20px' }}>
+        {/* Кнопка вишлиста со счетчиком */}
+        <div onClick={onOpenWishlist} style={{ cursor: 'pointer' }}>
+          ❤️ Избранное: <strong>{wishlistCount}</strong>
+        </div>
+
+        <div>
+          🛒 Корзина: <strong>{cartCount}</strong> ({totalPrice} руб.)
         </div>
       </div>
     </header>
