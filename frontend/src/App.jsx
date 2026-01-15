@@ -29,7 +29,7 @@ function App() {
       orderId: Date.now() + Math.random()
     }));
 
-    setOrders([...orders, ...newOrders]); // Теперь она должна их видеть
+    setOrders([...orders, ...newOrders]); 
     setCard([]); 
     setView('orders');
     alert("Заказ оформлен!");
