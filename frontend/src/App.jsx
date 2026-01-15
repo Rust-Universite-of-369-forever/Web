@@ -9,6 +9,31 @@ function App() {
   const [error, setError] = useState(null);
   const [card, setCard] = useState([]);
   const [view, setView] = useState('shop');
+  const [orders, setOrders] = useState([]);
+
+  const palaceOrder = (product) => {
+    const neOrder = {...product, orderId: Date.now()};
+    setOrders(...orders, neOrder)
+  }
+
+  const cancelOrder = (orderId) => {
+    if(window.confirm("Вы действительно хотите удалить заказ?"))
+    {
+      setOrders(orders.filter(item => item.orderId !== orderId))
+    }
+  }
+
+  const handleCheckout = () => {
+    const newOrders = card.map(item => ({
+      ...item,
+      orderId: Date.now() + Math.random()
+    }));
+
+    setOrders([...orders, ...newOrders]); // Теперь она должна их видеть
+    setCard([]); 
+    setView('orders');
+    alert("Заказ оформлен!");
+  };
 
   const [wishlist, setwishlist] = useState(() => {
     const saved = localStorage.getItem('my_wishlist')
@@ -46,6 +71,7 @@ function App() {
     } else {
       alert(`Извините, товара "${productToAdd.name}" больше нет в наличии.`);
     }
+    alert(`Поздравлям! Вы заказали товар "${productToAdd.name}!"`)
   };
 
   useEffect(() => {
@@ -78,7 +104,8 @@ function App() {
   return (
     <div style={{ backgroundColor: '#f9f9f9', minHeight: '100vh' }}>
       <Header cartCount={card.length} totalPrice={totalPrice} 
-      onOpenVishList={() => setView('wishlist')} onOpenShop={() => setView('shop')} wishlistCount={wishlist.length}/>
+      onOpenWishList={() => setView('wishlist')} onOpenShop={() => setView('shop')} wishlistCount={wishlist.length}
+      onOpenOrders={() => setView('orders')} ordersCount={orders.length} onOpenCard={() => setView('card')}/>
       
       <main style={{ padding: '0 40px' }}>
         {view === 'shop' ? (
@@ -93,6 +120,8 @@ function App() {
                   onAdd={() => addToCart(product)}
                   onWishlist={() => toggleWishlist(product)}
                   isFavorite={wishlist.some(item => item.id === product.id)}
+                  onOrder={() => palaceOrder(product)}
+                  onCancel={() => cancelOrder(product)}
                 />
               ))}
             </div>
@@ -118,7 +147,63 @@ function App() {
               </div>
             )}
           </>
-        )}       
+        )}
+        {view === 'card' && (
+          <>
+            <button onClick={() => setView('shop')}>← Вернуться в магазин</button>
+      <h1 style={{ textAlign: 'center' }}>Моя корзина ({card.length})</h1>
+      {card.length === 0 ? (
+        <p style={{ textAlign: 'center' }}>Корзина пуста</p>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
+          {card.map((product, index) => (
+            <div key={index} style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '10px' }}>
+              <h3>{product.name}</h3>
+              <p>{product.price} руб.</p>
+              {/* Тут можно добавить кнопку "Удалить из корзины" */}
+            </div>
+          ))}
+          <div style={{ gridColumn: '1 / -1', textAlign: 'right', padding: '20px' }}>
+            <h2>Итого: {totalPrice} руб.</h2>
+            <button onClick={handleCheckout} style={{ padding: '10px 20px', backgroundColor: '#27ae60', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', position: 'relative', 
+            zIndex: 999  }}>
+              Оформить заказ
+            </button>
+          </div>
+        </div>
+      )}
+          </>
+        )}
+        {view === 'orders' && (
+    <>
+      <button onClick={() => setView('shop')} style={{ marginBottom: '20px' }}>← В магазин</button>
+      <h1 style={{ textAlign: 'center' }}>Мои заказы ({orders.length})</h1>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
+        {orders.map(order => (
+          <div key={order.orderId} style={{ border: '1px solid #ddd', padding: '20px', borderRadius: '12px', position: 'relative', backgroundColor: 'white' }}>
+            <h3>{order.name}</h3>
+            <p>Цена: <strong>{order.price} руб.</strong></p>
+            <p style={{ color: '#27ae60', fontSize: '14px' }}>● Оформлено (Ожидает получения)</p>
+            <button 
+              onClick={() => cancelOrder(order.orderId)}
+              style={{
+                marginTop: '10px',
+                width: '100%',
+                backgroundColor: '#f44336',
+                color: 'white',
+                border: 'none',
+                padding: '8px',
+                borderRadius: '5px',
+                cursor: 'pointer'
+              }}
+            >
+              Отменить заказ
+            </button>
+          </div>
+        ))}
+      </div>
+    </>
+  )}       
       </main>
     </div>
   );

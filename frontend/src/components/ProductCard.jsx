@@ -6,6 +6,7 @@ function ProductCard({ product, onAdd, onWishlist, isFavorite }) {
       border: '1px solid #ddd',
       borderRadius: '12px',
       padding: '15px',
+      position: "relative",
       textAlign: 'center',
       backgroundColor: '#fff',
       display: 'flex',
@@ -53,7 +54,17 @@ function ProductCard({ product, onAdd, onWishlist, isFavorite }) {
 
       <button 
         onClick={onWishlist} 
-        style={{ color: isFavorite ? 'red' : 'gray', border: 'none', background: 'none', cursor: 'pointer' }}
+        style={{ color: isFavorite ? 'red' : 'gray', 
+          position: "absolute",
+          top: "10px",
+          right: "10px",
+          border: 'none', 
+          background: 'none', 
+          cursor: 'pointer', 
+          zIndex: "10" }}
+
+        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
+        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
       >
         {isFavorite ? '❤️' : '🤍'}
       </button>
