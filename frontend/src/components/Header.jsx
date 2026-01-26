@@ -15,7 +15,6 @@ function Header({ cartCount, wishlistCount, totalPrice, onOpenWishList, onOpenSh
         </div>
 
       <div style={{ display: 'flex', gap: '20px' }}>
-        {/* Кнопка вишлиста со счетчиком */}
         <div onClick={onOpenWishList} style={{ cursor: 'pointer' }}>
           ❤️ Избранное: <strong>{wishlistCount}</strong>
         </div>

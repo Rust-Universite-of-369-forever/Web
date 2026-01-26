@@ -10,6 +10,11 @@ function App() {
   const [card, setCard] = useState([]);
   const [view, setView] = useState('shop');
   const [orders, setOrders] = useState([]);
+  const [seacrhQuery, setSeacrhQuery] = useState('');
+
+  const filterProducts = products.filter(products => 
+    products.name.toLowerCase().includes(seacrhQuery.toLowerCase())
+  )
 
   const palaceOrder = (product) => {
     const neOrder = {...product, orderId: Date.now()};
@@ -29,7 +34,7 @@ function App() {
       orderId: Date.now() + Math.random()
     }));
 
-    setOrders([...orders, ...newOrders]); // Теперь она должна их видеть
+    setOrders([...orders, ...newOrders]); 
     setCard([]); 
     setView('orders');
     alert("Заказ оформлен!");
@@ -111,19 +116,35 @@ function App() {
         {view === 'shop' ? (
           <>
             <h1 style={{ textAlign: 'center', marginBottom: '30px'}}>Наши товары</h1>
+
+            <div style={{textAlign: 'center', marginBottom: '30px'}}>
+              <input
+              type="text"
+              placeholder='поиск товара'
+              value={seacrhQuery}
+              onChange={(e) => setSeacrhQuery(e.target.value)}        
+              style={{ padding: '10px', width: '300px', borderRadius: '8px', border: '1px solid #ccc' }}
+              />
+            </div>
+
             {isLoading && <p>Загрузка...</p>}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
-              {products.map(product => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product} 
-                  onAdd={() => addToCart(product)}
-                  onWishlist={() => toggleWishlist(product)}
-                  isFavorite={wishlist.some(item => item.id === product.id)}
-                  onOrder={() => palaceOrder(product)}
-                  onCancel={() => cancelOrder(product)}
-                />
-              ))}
+              {filterProducts.length > 0 ? (
+                filterProducts.map(product => (
+                  <ProductCard 
+                    key={product.id} 
+                    product={product} 
+                    onAdd={() => addToCart(product)}
+                    onWishlist={() => toggleWishlist(product)}
+                    isFavorite={wishlist.some(item => item.id === product.id)}
+                    onOrder={() => palaceOrder(product)}
+                    onCancel={() => cancelOrder(product)}
+                  />
+                ))
+              ) : (
+                <p style={{ textAlign: 'center', gridColumn: '1 / -1' }}>Ничего не найдено :(</p>
+              )}
+              
             </div>
           </>
         ) : (
@@ -160,7 +181,6 @@ function App() {
             <div key={index} style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '10px' }}>
               <h3>{product.name}</h3>
               <p>{product.price} руб.</p>
-              {/* Тут можно добавить кнопку "Удалить из корзины" */}
             </div>
           ))}
           <div style={{ gridColumn: '1 / -1', textAlign: 'right', padding: '20px' }}>
